@@ -2,7 +2,7 @@ import React from 'react';
 import { db } from '../../services/firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import { fixture } from '../../utils/fixture'; 
-import { knockoutFixture } from '../../utils/knockoutFixture'; 
+import { knockoutFixture } from '../../utils/KnockoutFixture'; 
 import { Trophy, Settings, Users, Zap } from 'lucide-react';
 
 const AdminPanel = () => {
