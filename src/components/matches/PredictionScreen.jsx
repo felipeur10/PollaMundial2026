@@ -6,7 +6,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useOfficialFixture } from '../../hooks/useOfficialFixture';
 
 import { fixture } from '../../utils/fixture';
-import { knockoutFixture } from '../../utils/knockoutFixture';
+import { knockoutFixture } from '../../utils/KnockoutFixture';
 
 import MatchCard from './MatchCard';
 import GroupTable from './GroupTable';
