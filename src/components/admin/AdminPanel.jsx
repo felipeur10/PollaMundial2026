@@ -4,6 +4,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { fixture } from '../../utils/fixture'; 
 import { knockoutFixture } from '../../utils/KnockoutFixture'; 
 import { Trophy, Settings, Users, Zap } from 'lucide-react';
+import { doc, setDoc } from 'firebase/firestore'; // ya lo tienes
 
 const AdminPanel = () => {
 
@@ -45,6 +46,27 @@ const AdminPanel = () => {
       console.error(e);
     }
   };
+  // 3. PUBLICAR PICKS ESPECIALES OFICIALES
+const saveOfficialSpecial = async () => {
+  const champion = document.getElementById('special-champion').value.trim();
+  const topScorer = document.getElementById('special-topScorer').value.trim();
+  const bestGoalkeeper = document.getElementById('special-bestGoalkeeper').value.trim();
+
+  if (!champion || !topScorer || !bestGoalkeeper)
+    return alert("Completa los tres campos antes de publicar.");
+
+  try {
+    await setDoc(doc(db, "officialSpecial", "picks"), {
+      champion,
+      topScorer,
+      bestGoalkeeper,
+      publishedAt: new Date().toISOString()
+    });
+    alert("Picks especiales publicados. ¡Puntos actualizados! ⭐");
+  } catch (e) {
+    console.error(e);
+  }
+};
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen pb-20">
@@ -119,6 +141,38 @@ const AdminPanel = () => {
             ))}
           </div>
         </section>
+        {/* --- BLOQUE 3: PICKS ESPECIALES OFICIALES --- */}
+<section className="mt-12">
+  <div className="flex items-center gap-2 mb-6">
+    <Trophy className="text-yellow-500" size={20} />
+    <h2 className="text-xl font-black italic uppercase tracking-tighter">3. Picks Especiales Oficiales</h2>
+  </div>
+  <div className="bg-white p-6 rounded-[32px] shadow-sm border border-gray-200 space-y-4">
+    <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">
+      Publicar solo al final del torneo. Cada acierto vale +8 pts.
+    </p>
+    {[
+      { id: 'special-champion', label: '🏆 Campeón del Mundial', placeholder: 'Ej: Argentina' },
+      { id: 'special-topScorer', label: '⚽ Goleador del torneo', placeholder: 'Ej: Mbappé' },
+      { id: 'special-bestGoalkeeper', label: '🧤 Mejor arquero', placeholder: 'Ej: Courtois' },
+    ].map(({ id, label, placeholder }) => (
+      <div key={id}>
+        <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1 block">{label}</label>
+        <input
+          id={id}
+          placeholder={placeholder}
+          className="w-full p-3 bg-gray-50 rounded-xl font-bold text-sm border border-gray-200 focus:ring-2 focus:ring-yellow-400 outline-none"
+        />
+      </div>
+    ))}
+    <button
+      onClick={saveOfficialSpecial}
+      className="w-full bg-yellow-500 text-white py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-yellow-600 transition-all active:scale-95 shadow-lg shadow-yellow-100"
+    >
+      Publicar resultados oficiales ⭐
+    </button>
+  </div>
+</section>
       </div>
     </div>
   );

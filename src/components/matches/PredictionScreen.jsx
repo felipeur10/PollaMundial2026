@@ -4,6 +4,7 @@ import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useFirestore } from '../../hooks/useFirestore';
 import { useAuth } from '../../hooks/useAuth';
 import { useOfficialFixture } from '../../hooks/useOfficialFixture';
+import { useOfficialSpecial } from '../../hooks/useOfficialSpecial'; // ✅ NUEVO
 
 import { fixture } from '../../utils/fixture';
 import { knockoutFixture } from '../../utils/KnockoutFixture';
@@ -11,6 +12,7 @@ import { knockoutFixture } from '../../utils/KnockoutFixture';
 import MatchCard from './MatchCard';
 import GroupTable from './GroupTable';
 import ThirdPlacesTable from './ThirdPlacesTable';
+import SpecialPicks from './SpecialPicks'; // ✅ NUEVO
 
 import { calculateGroupTable } from '../../utils/groupLogic';
 import { getBestThirdPlaces } from '../../utils/thirdPlacesLogic';
@@ -18,7 +20,7 @@ import { ChevronLeft, Send, Trophy, Eye, CloudFog, CheckCircle, AlertCircle } fr
 
 const groups = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
 
-// ─── Toast de notificación ───────────────────────────────────────────────────
+// ─── Toast ───────────────────────────────────────────────────────────────────
 const Toast = ({ message, type, onClose }) => {
   useEffect(() => {
     const t = setTimeout(onClose, 3000);
@@ -40,16 +42,20 @@ const Toast = ({ message, type, onClose }) => {
 // ─── Componente principal ────────────────────────────────────────────────────
 const PredictionScreen = ({ readOnly = false }) => {
   const navigate = useNavigate();
-  const { uid } = useParams(); // uid presente solo en modo lectura
+  const { uid } = useParams();
   const { user, loading: authLoading } = useAuth();
-  const { saveAllPredictions, getUserPredictions } = useFirestore();
+  const { saveAllPredictions, saveSpecialPicks, getUserPredictions } = useFirestore(); // ✅ saveSpecialPicks añadido
   const officialData = useOfficialFixture();
+  const officialSpecial = useOfficialSpecial(); // ✅ NUEVO
 
   // Estado modo edición
   const [userPredictions, setUserPredictions] = useLocalStorage('mis_predicciones_2026', {});
   const [isSyncing, setIsSyncing] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
-  const [toast, setToast] = useState(null); // { message, type }
+  const [toast, setToast] = useState(null);
+
+  // ✅ NUEVO: special picks del usuario autenticado (vienen de Firestore, no localStorage)
+  const [savedSpecialPicks, setSavedSpecialPicks] = useState({});
 
   // Estado modo lectura
   const [viewedPredictions, setViewedPredictions] = useState({});
@@ -59,12 +65,11 @@ const PredictionScreen = ({ readOnly = false }) => {
   // Carga datos cuando es modo lectura
   useEffect(() => {
     if (!readOnly || !uid) return;
-    
     const loadUserData = async () => {
       setIsLoadingView(true);
       const result = await getUserPredictions(uid);
       if (result.success && result.data) {
-        setViewedPredictions(result.data.predictions || {});
+        setViewedPredictions(result.data || {});
         setViewedUser({
           name: result.data.userName || 'Anónimo',
           photo: result.data.userPhoto || null,
@@ -72,15 +77,26 @@ const PredictionScreen = ({ readOnly = false }) => {
       }
       setIsLoadingView(false);
     };
-
     loadUserData();
   }, [uid, readOnly]);
 
+  // ✅ NUEVO: carga los special picks del usuario autenticado al montar
+  useEffect(() => {
+    if (readOnly || !user) return;
+    getUserPredictions(user.uid).then(result => {
+      if (result.success && result.data?.specialPicks) {
+        setSavedSpecialPicks(result.data.specialPicks);
+      }
+    });
+  }, [user]);
+
   // Las predicciones activas dependen del modo
-  const activePredictions = readOnly ? viewedPredictions : userPredictions;
+  const activePredictions = readOnly
+    ? viewedPredictions.predictions || {}
+    : userPredictions;
 
   const handleSavePrediction = (data) => {
-    if (readOnly) return; // No-op en modo lectura
+    if (readOnly) return;
     setUserPredictions(prev => ({ ...prev, [data.matchId]: data }));
     setIsDirty(true);
   };
@@ -98,7 +114,15 @@ const PredictionScreen = ({ readOnly = false }) => {
     setIsSyncing(false);
   };
 
-  // ─── Loading states ────────────────────────────────────────────────────────
+  // ✅ NUEVO: guarda los special picks directo a Firestore
+  const handleSaveSpecialPicks = async (picks) => {
+    if (!user) return { success: false };
+    const result = await saveSpecialPicks(user.uid, picks, user);
+    if (result.success) setSavedSpecialPicks(picks);
+    return result;
+  };
+
+  // ─── Loading states ──────────────────────────────────────────────────────
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center font-black italic text-gray-400">
@@ -140,11 +164,7 @@ const PredictionScreen = ({ readOnly = false }) => {
     <div className="min-h-screen bg-gray-100 pb-44">
       {/* Toast */}
       {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
+        <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
       )}
 
       {/* ─── Header ─────────────────────────────────────────────────────────── */}
@@ -158,7 +178,7 @@ const PredictionScreen = ({ readOnly = false }) => {
           >
             <ChevronLeft size={24} />
           </button>
-          
+
           {readOnly ? (
             <div className="flex items-center gap-3">
               {viewedUser?.photo && (
@@ -187,7 +207,6 @@ const PredictionScreen = ({ readOnly = false }) => {
 
         {!readOnly && user && (
           <div className="flex items-center gap-3">
-            {/* Indicador de cambios sin guardar */}
             {isDirty && (
               <span className="text-[9px] font-black uppercase bg-yellow-500 text-yellow-900 px-2 py-1 rounded-full animate-pulse">
                 Sin guardar
@@ -202,7 +221,7 @@ const PredictionScreen = ({ readOnly = false }) => {
         )}
       </div>
 
-      {/* ─── Banner modo lectura ──────────────────────────────────────────── */}
+      {/* ─── Banner modo lectura ─────────────────────────────────────────── */}
       {readOnly && (
         <div className="bg-blue-50 border-b border-blue-100 px-4 py-3 flex items-center justify-between">
           <p className="text-blue-700 text-xs font-bold uppercase tracking-wide">
@@ -218,7 +237,19 @@ const PredictionScreen = ({ readOnly = false }) => {
       )}
 
       <div className="p-4 max-w-2xl mx-auto">
-        {/* ─── FASE DE GRUPOS ───────────────────────────────────────────────── */}
+
+        {/* ─── PICKS ESPECIALES ────────────────────────────────────────────── */}
+        <SpecialPicks
+          savedPicks={readOnly
+            ? (viewedPredictions?.specialPicks || {})
+            : savedSpecialPicks
+          }
+          officialSpecial={officialSpecial}
+          onSave={handleSaveSpecialPicks}
+          readOnly={readOnly}
+        />
+
+        {/* ─── FASE DE GRUPOS ──────────────────────────────────────────────── */}
         <div className="mb-12">
           <div className="flex items-center gap-2 mb-8 bg-white p-4 rounded-2xl shadow-sm border-l-4 border-green-600">
             <Trophy className="text-green-600" size={20} />
@@ -258,7 +289,7 @@ const PredictionScreen = ({ readOnly = false }) => {
         {/* ─── MEJORES TERCEROS ────────────────────────────────────────────── */}
         <ThirdPlacesTable thirds={bestThirds} />
 
-        {/* ─── MUERTE SÚBITA ────────────────────────────────────────────────── */}
+        {/* ─── MUERTE SÚBITA ───────────────────────────────────────────────── */}
         <div className="mt-20">
           <div className="flex items-center gap-2 mb-10 bg-gray-900 p-5 rounded-[32px] shadow-xl border-b-4 border-blue-500">
             <div className="bg-blue-500 p-2 rounded-xl">

@@ -3,16 +3,16 @@ import { doc, setDoc, getDoc, collection, getDocs } from 'firebase/firestore';
 
 export const useFirestore = () => {
 
-  // ✅ Guarda todas las predicciones en UN SOLO documento por usuario
+  // ✅ merge: true para no pisar specialPicks al guardar predicciones
   const saveAllPredictions = async (userId, predictions, user) => {
     try {
-      const userRef = doc(db, "predictions", userId); // <- ID = userId
+      const userRef = doc(db, "predictions", userId);
       await setDoc(userRef, {
         userName: user.displayName || "Anónimo",
         userPhoto: user.photoURL || null,
-        predictions: predictions, // <- Todo el objeto de una vez
+        predictions: predictions,
         updatedAt: new Date()
-      });
+      }, { merge: true });
       return { success: true };
     } catch (error) {
       console.error("Error guardando en Firebase:", error);
@@ -20,14 +20,28 @@ export const useFirestore = () => {
     }
   };
 
-  // ✅ Lee las predicciones de UN usuario específico (para modo lectura)
+  // ✅ NUEVO: guarda campeón, goleador y arquero del usuario
+  const saveSpecialPicks = async (userId, specialPicks, user) => {
+    try {
+      const userRef = doc(db, "predictions", userId);
+      await setDoc(userRef, {
+        userName: user.displayName || "Anónimo",
+        userPhoto: user.photoURL || null,
+        specialPicks: specialPicks,
+        updatedAt: new Date()
+      }, { merge: true });
+      return { success: true };
+    } catch (error) {
+      console.error("Error guardando picks especiales:", error);
+      return { success: false, error };
+    }
+  };
+
   const getUserPredictions = async (userId) => {
     try {
       const userRef = doc(db, "predictions", userId);
       const snap = await getDoc(userRef);
-      if (snap.exists()) {
-        return { success: true, data: snap.data() };
-      }
+      if (snap.exists()) return { success: true, data: snap.data() };
       return { success: false, data: null };
     } catch (error) {
       console.error("Error leyendo predicciones:", error);
@@ -35,14 +49,11 @@ export const useFirestore = () => {
     }
   };
 
-  // ✅ Lee predicciones de TODOS los usuarios (para el ranking)
   const getAllPredictions = async () => {
     try {
       const snapshot = await getDocs(collection(db, "predictions"));
       const all = {};
-      snapshot.forEach(doc => {
-        all[doc.id] = doc.data();
-      });
+      snapshot.forEach(doc => { all[doc.id] = doc.data(); });
       return { success: true, data: all };
     } catch (error) {
       console.error("Error leyendo todas las predicciones:", error);
@@ -50,5 +61,5 @@ export const useFirestore = () => {
     }
   };
 
-  return { saveAllPredictions, getUserPredictions, getAllPredictions };
+  return { saveAllPredictions, saveSpecialPicks, getUserPredictions, getAllPredictions };
 };

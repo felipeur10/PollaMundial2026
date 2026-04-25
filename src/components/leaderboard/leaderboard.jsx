@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useOfficialResults } from '../../hooks/useOfficialResults';
+import { useOfficialSpecial } from '../../hooks/useOfficialSpecial'; // ✅ NUEVO
 import { useRanking } from '../../hooks/useRanking';
 import { useAuth } from '../../hooks/useAuth';
 import { Trophy, Medal, Star, Eye, ChevronLeft } from 'lucide-react';
@@ -9,7 +10,8 @@ const Leaderboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const officialResults = useOfficialResults();
-  const ranking = useRanking(officialResults);
+  const officialSpecial = useOfficialSpecial(); // ✅ NUEVO
+  const ranking = useRanking(officialResults, officialSpecial); // ✅ MODIFICADO
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">

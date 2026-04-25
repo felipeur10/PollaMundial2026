@@ -7,7 +7,8 @@ import { getBestThirdPlaces } from '../utils/thirdPlacesLogic';
 
 const groups = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
 
-export const useRanking = (officialResults) => {
+// ✅ Ahora recibe también officialSpecial como segundo parámetro
+export const useRanking = (officialResults, officialSpecial = {}) => {
   const [ranking, setRanking] = useState([]);
 
   useEffect(() => {
@@ -17,6 +18,7 @@ export const useRanking = (officialResults) => {
       snapshot.forEach(doc => {
         const userData = doc.data();
         const userPredictions = userData.predictions || {};
+        const userSpecialPicks = userData.specialPicks || {};
         let totalPoints = 0;
         let bonusCount = 0;
 
@@ -27,7 +29,6 @@ export const useRanking = (officialResults) => {
 
           if (pred && real) {
             const isExact = pred.homeScore === real.homeScore && pred.awayScore === real.awayScore;
-            
             const realWinner = real.homeScore > real.awayScore ? 'home' : real.homeScore < real.awayScore ? 'away' : 'draw';
             const predWinner = pred.homeScore > pred.awayScore ? 'home' : pred.homeScore < pred.awayScore ? 'away' : 'draw';
 
@@ -44,13 +45,12 @@ export const useRanking = (officialResults) => {
           const userTable = calculateGroupTable(groupLetter, fixture, userPredictions);
           const realTable = calculateGroupTable(groupLetter, fixture, officialResults);
 
-          // ✅ FIX #1: cada equipo juega 3 partidos de grupos, no 6
+          // ✅ FIX: cada equipo juega 3 partidos de grupos
           const isGroupFinished = realTable.every(t => t.pld === 3);
 
           if (isGroupFinished && realTable.length >= 2 && userTable.length >= 2) {
             const firstOk = userTable[0].name === realTable[0].name;
             const secondOk = userTable[1].name === realTable[1].name;
-
             if (firstOk && secondOk) {
               totalPoints += 3;
               bonusCount++;
@@ -62,7 +62,7 @@ export const useRanking = (officialResults) => {
         const realBestThirds = getBestThirdPlaces(groups, fixture, officialResults).map(t => t.name);
         const userBestThirds = getBestThirdPlaces(groups, fixture, userPredictions).map(t => t.name);
 
-        // ✅ FIX #2: filtrar solo partidos de fase de grupos para no contaminar con knockout
+        // ✅ FIX: filtrar solo partidos de fase de grupos
         const groupMatchIds = Object.keys(officialResults).filter(id => {
           const match = fixture.find(m => m.id === id);
           return match?.phase === 'grupos';
@@ -76,6 +76,21 @@ export const useRanking = (officialResults) => {
             bonusCount++;
           }
         }
+
+        // --- LÓGICA D: PICKS ESPECIALES (+8 pts cada uno) ---
+        const specialCategories = ['champion', 'topScorer', 'bestGoalkeeper'];
+        specialCategories.forEach(category => {
+          const official = officialSpecial[category];
+          const userPick = userSpecialPicks[category];
+          if (official && userPick) {
+            // Comparación insensible a mayúsculas/tildes para mayor tolerancia
+            const normalize = str => str.trim().toLowerCase();
+            if (normalize(official) === normalize(userPick)) {
+              totalPoints += 8;
+              bonusCount++;
+            }
+          }
+        });
 
         allUsersPoints.push({
           id: doc.id,
@@ -95,7 +110,7 @@ export const useRanking = (officialResults) => {
     });
 
     return () => unsubscribe();
-  }, [officialResults]);
+  }, [officialResults, officialSpecial]);
 
   return ranking;
 };
