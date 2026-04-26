@@ -200,21 +200,33 @@ const Home = () => {
 {/* Resumen */}
 <div className="bg-green-600 rounded-3xl p-5 shadow-lg">
   <p className="text-green-200 font-black uppercase text-[10px] tracking-widest mb-4 text-center">Resumen rápido</p>
-  <div className="grid-cols-3 sm:grid-cols-4">
+  <div className="grid grid-cols-4 gap-2 text-center mb-2">
     {[
       { pts: '5', label: 'Exacto' },
       { pts: '2', label: 'Ganador' },
       { pts: '3', label: 'Bono\ngrupo' },
       { pts: '3', label: 'Bono\n3eros' },
-      { pts: '8', label: 'Campeón' },
-      { pts: '8', label: 'Goleador' },
-      { pts: '8', label: 'Arquero' },
     ].map(({ pts, label }) => (
       <div key={label} className="bg-green-700/50 rounded-2xl py-3 px-1">
         <p className="text-white font-black text-2xl">+{pts}</p>
         <p className="text-green-200 text-[10px] mt-1 whitespace-pre-line leading-tight">{label}</p>
       </div>
     ))}
+  </div>
+  <div className="border-t border-green-500 pt-3 mt-1">
+    <p className="text-green-200 font-black uppercase text-[10px] tracking-widest mb-2 text-center">Picks especiales</p>
+    <div className="grid grid-cols-3 gap-2 text-center">
+      {[
+        { pts: '8', label: 'Campeón' },
+        { pts: '8', label: 'Goleador' },
+        { pts: '8', label: 'Arquero' },
+      ].map(({ pts, label }) => (
+        <div key={label} className="bg-yellow-500/30 border border-yellow-400/40 rounded-2xl py-3 px-1">
+          <p className="text-yellow-300 font-black text-2xl">+{pts}</p>
+          <p className="text-yellow-100 text-[10px] mt-1 leading-tight">{label}</p>
+        </div>
+      ))}
+    </div>
   </div>
 </div>
 
