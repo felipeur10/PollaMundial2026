@@ -84,7 +84,7 @@ export const useRanking = (officialResults, officialSpecial = {}) => {
           const userPick = userSpecialPicks[category];
           if (official && userPick) {
             // Comparación insensible a mayúsculas/tildes para mayor tolerancia
-            const normalize = str => str.trim().toLowerCase();
+            const normalize = str => str.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
             if (normalize(official) === normalize(userPick)) {
               totalPoints += 8;
               bonusCount++;

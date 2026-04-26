@@ -64,7 +64,7 @@ const SpecialPicks = ({ savedPicks = {}, officialSpecial = {}, onSave, readOnly 
     const official = officialSpecial[key];
     const userPick = picks[key];
     if (!official || !userPick) return null;
-    const normalize = s => s.trim().toLowerCase();
+    const normalize = str => str.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     const isCorrect = normalize(official) === normalize(userPick);
     return isCorrect
       ? <span className="text-[9px] font-black bg-green-100 text-green-700 px-2 py-0.5 rounded-full">✓ +8 pts</span>
