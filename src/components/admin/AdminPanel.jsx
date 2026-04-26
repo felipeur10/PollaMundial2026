@@ -4,7 +4,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { fixture } from '../../utils/fixture'; 
 import { knockoutFixture } from '../../utils/KnockoutFixture'; 
 import { Trophy, Settings, Users, Zap } from 'lucide-react';
-import { doc, setDoc } from 'firebase/firestore'; // ya lo tienes
+
 
 const AdminPanel = () => {
 
