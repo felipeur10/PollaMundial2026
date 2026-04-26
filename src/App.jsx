@@ -11,7 +11,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import { LogIn, LogOut, Trophy, Target, Star, Zap, ChevronDown } from 'lucide-react';
 
 const Home = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, notAllowed } = useAuth(); // ✅ notAllowed añadido
   const navigate = useNavigate();
 
   if (loading) return (
@@ -66,6 +66,17 @@ const Home = () => {
             </div>
           ) : (
             <div className="flex flex-col items-center">
+              {/* ✅ Mensaje de acceso denegado */}
+              {notAllowed && (
+                <div className="bg-red-50 border border-red-200 rounded-2xl px-4 py-3 mb-6 w-full">
+                  <p className="text-red-600 text-xs font-black uppercase tracking-wide text-center">
+                    ⛔ Este correo no tiene acceso a la polla.
+                  </p>
+                  <p className="text-red-400 text-[10px] text-center mt-1">
+                    Contacta a Felipe para que te agregue.
+                  </p>
+                </div>
+              )}
               <div className="bg-gray-50 p-6 rounded-3xl mb-8 border border-dashed border-gray-200">
                 <p className="text-gray-500 text-xs font-medium leading-relaxed">
                   Únete a la polla oficial, compite con tus amigos y demuestra quién sabe más de fútbol.
@@ -165,7 +176,6 @@ const Home = () => {
                 </div>
               </div>
             </div>
-
             <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4">
               <div className="flex items-start justify-between gap-3 mb-2">
                 <p className="text-gray-900 font-black text-sm">Bono Mejores Terceros</p>
@@ -197,38 +207,38 @@ const Home = () => {
           </div>
         </div>
 
-{/* Resumen */}
-<div className="bg-green-600 rounded-3xl p-5 shadow-lg">
-  <p className="text-green-200 font-black uppercase text-[10px] tracking-widest mb-4 text-center">Resumen rápido</p>
-  <div className="grid grid-cols-4 gap-2 text-center mb-2">
-    {[
-      { pts: '5', label: 'Exacto' },
-      { pts: '2', label: 'Ganador' },
-      { pts: '3', label: 'Bono\ngrupo' },
-      { pts: '3', label: 'Bono\n3eros' },
-    ].map(({ pts, label }) => (
-      <div key={label} className="bg-green-700/50 rounded-2xl py-3 px-1">
-        <p className="text-white font-black text-2xl">+{pts}</p>
-        <p className="text-green-200 text-[10px] mt-1 whitespace-pre-line leading-tight">{label}</p>
-      </div>
-    ))}
-  </div>
-  <div className="border-t border-green-500 pt-3 mt-1">
-    <p className="text-green-200 font-black uppercase text-[10px] tracking-widest mb-2 text-center">Picks especiales</p>
-    <div className="grid grid-cols-3 gap-2 text-center">
-      {[
-        { pts: '8', label: 'Campeón' },
-        { pts: '8', label: 'Goleador' },
-        { pts: '8', label: 'Arquero' },
-      ].map(({ pts, label }) => (
-        <div key={label} className="bg-yellow-500/30 border border-yellow-400/40 rounded-2xl py-3 px-1">
-          <p className="text-yellow-300 font-black text-2xl">+{pts}</p>
-          <p className="text-yellow-100 text-[10px] mt-1 leading-tight">{label}</p>
+        {/* Resumen */}
+        <div className="bg-green-600 rounded-3xl p-5 shadow-lg">
+          <p className="text-green-200 font-black uppercase text-[10px] tracking-widest mb-4 text-center">Resumen rápido</p>
+          <div className="grid grid-cols-4 gap-2 text-center mb-2">
+            {[
+              { pts: '5', label: 'Exacto' },
+              { pts: '2', label: 'Ganador' },
+              { pts: '3', label: 'Bono\ngrupo' },
+              { pts: '3', label: 'Bono\n3eros' },
+            ].map(({ pts, label }) => (
+              <div key={label} className="bg-green-700/50 rounded-2xl py-3 px-1">
+                <p className="text-white font-black text-2xl">+{pts}</p>
+                <p className="text-green-200 text-[10px] mt-1 whitespace-pre-line leading-tight">{label}</p>
+              </div>
+            ))}
+          </div>
+          <div className="border-t border-green-500 pt-3 mt-1">
+            <p className="text-green-200 font-black uppercase text-[10px] tracking-widest mb-2 text-center">Picks especiales</p>
+            <div className="grid grid-cols-3 gap-2 text-center">
+              {[
+                { pts: '8', label: 'Campeón' },
+                { pts: '8', label: 'Goleador' },
+                { pts: '8', label: 'Arquero' },
+              ].map(({ pts, label }) => (
+                <div key={label} className="bg-yellow-500/30 border border-yellow-400/40 rounded-2xl py-3 px-1">
+                  <p className="text-yellow-300 font-black text-2xl">+{pts}</p>
+                  <p className="text-yellow-100 text-[10px] mt-1 leading-tight">{label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-      ))}
-    </div>
-  </div>
-</div>
 
         {/* CTA final */}
         {!user ? (
