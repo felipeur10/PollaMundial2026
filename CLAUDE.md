@@ -370,11 +370,6 @@ Sin este archivo, las rutas como `/predicciones` o `/ranking` dan 404 al recarga
 - fixture.js completo con los 72 partidos reales
 - knockoutFixture.js completo con los 32 partidos eliminatorios
 
-### 🔴 Pendiente — Crítico antes del deploy
-- [ ] Corregir `pld === 6` → `pld === 3` en `useRanking.js`
-- [ ] Corregir detección de fin de fase de grupos en `useRanking.js`
-- [ ] Crear `vercel.json` con el rewrite para React Router
-- [ ] Configurar variables de entorno en Vercel
 
 ### 🟡 Pendiente — Antes de invitar participantes
 - [ ] Implementar lista blanca de emails (para beta privada)

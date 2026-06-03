@@ -24,7 +24,8 @@ export const fixture = [
   { id: 'm07', group: 'C', home: 'Brasil',          away: 'Marruecos',        date: '2026-06-13T22:00:00Z', phase: 'grupos' },
   { id: 'm08', group: 'C', home: 'Haití',           away: 'Escocia',          date: '2026-06-14T01:00:00Z', phase: 'grupos' },
   { id: 'm31', group: 'C', home: 'Escocia',         away: 'Marruecos',        date: '2026-06-19T22:00:00Z', phase: 'grupos' },
-  { id: 'm32', group: 'C', home: 'Brasil',          away: 'Haití',            date: '2026-06-20T01:00:00Z', phase: 'grupos' },
+  // ✅ FIX m32: Brasil vs Haití — corregido de 01:00Z a 00:30Z (19:30 COT del Jun 19)
+  { id: 'm32', group: 'C', home: 'Brasil',          away: 'Haití',            date: '2026-06-20T00:30:00Z', phase: 'grupos' },
   { id: 'm51', group: 'C', home: 'Escocia',         away: 'Brasil',           date: '2026-06-24T22:00:00Z', phase: 'grupos' },
   { id: 'm52', group: 'C', home: 'Marruecos',       away: 'Haití',            date: '2026-06-24T22:00:00Z', phase: 'grupos' },
 
