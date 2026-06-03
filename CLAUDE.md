@@ -421,6 +421,17 @@ vercel --prod
 
 6. **readOnly como prop en PredictionScreen** — el mismo componente sirve para edición y lectura. Evita duplicar lógica y mantiene el código DRY. El modo se detecta por la prop `readOnly` y por la presencia del parámetro `uid` en la URL.
 
+## Cambios recientes
+
+### Privacidad de pronósticos en modo lectura (jun 2026)
+- **Archivos:** `src/components/matches/PredictionScreen.jsx`, `src/components/matches/MatchCard.jsx`
+- **Problema:** Los participantes podían ver los pronósticos de otros jugadores antes de que se jugara el partido (trampa).
+- **Solución:** Se agregó la función `getPredictionForView()` en `PredictionScreen.jsx` que filtra `savedPrediction` según `isMatchStarted(match)`. En modo lectura (`readOnly=true`), si el partido no ha comenzado, se pasa `null` al `MatchCard`.
+- **Comportamiento:** `MatchCard` muestra 🔒 *"Disponible tras el pitazo inicial"* para partidos no iniciados, y *"Sin pronóstico registrado"* si el partido ya se jugó pero el usuario no apostó.
+- **Regla:** El pronóstico se revela cuando `new Date() > new Date(match.date)` (al inicio del partido, no al final).
+
 ---
 
-*Última actualización: Abril 2026 — Sesión de desarrollo Bogotá HQ*
+*Última actualización: junio 03 2026 — Sesión de desarrollo Bogotá HQ*
+
+

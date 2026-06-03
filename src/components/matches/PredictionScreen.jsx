@@ -4,7 +4,7 @@ import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useFirestore } from '../../hooks/useFirestore';
 import { useAuth } from '../../hooks/useAuth';
 import { useOfficialFixture } from '../../hooks/useOfficialFixture';
-import { useOfficialSpecial } from '../../hooks/useOfficialSpecial'; // ✅ NUEVO
+import { useOfficialSpecial } from '../../hooks/useOfficialSpecial';
 
 import { fixture } from '../../utils/fixture';
 import { knockoutFixture } from '../../utils/KnockoutFixture';
@@ -12,13 +12,26 @@ import { knockoutFixture } from '../../utils/KnockoutFixture';
 import MatchCard from './MatchCard';
 import GroupTable from './GroupTable';
 import ThirdPlacesTable from './ThirdPlacesTable';
-import SpecialPicks from './SpecialPicks'; // ✅ NUEVO
+import SpecialPicks from './SpecialPicks';
 
 import { calculateGroupTable } from '../../utils/groupLogic';
 import { getBestThirdPlaces } from '../../utils/thirdPlacesLogic';
 import { ChevronLeft, Send, Trophy, Eye, CloudFog, CheckCircle, AlertCircle } from 'lucide-react';
 
 const groups = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+// Devuelve true si el partido ya comenzó (mercado cerrado)
+const isMatchStarted = (match) => {
+  return new Date() > new Date(match.date);
+};
+
+// En modo lectura, solo revela la predicción si el partido ya empezó
+const getPredictionForView = (match, predictions, readOnly) => {
+  if (!readOnly) return predictions[match.id];
+  return isMatchStarted(match) ? predictions[match.id] : null;
+};
 
 // ─── Toast ───────────────────────────────────────────────────────────────────
 const Toast = ({ message, type, onClose }) => {
@@ -44,9 +57,9 @@ const PredictionScreen = ({ readOnly = false }) => {
   const navigate = useNavigate();
   const { uid } = useParams();
   const { user, loading: authLoading } = useAuth();
-  const { saveAllPredictions, saveSpecialPicks, getUserPredictions } = useFirestore(); // ✅ saveSpecialPicks añadido
+  const { saveAllPredictions, saveSpecialPicks, getUserPredictions } = useFirestore();
   const officialData = useOfficialFixture();
-  const officialSpecial = useOfficialSpecial(); // ✅ NUEVO
+  const officialSpecial = useOfficialSpecial();
 
   // Estado modo edición
   const [userPredictions, setUserPredictions] = useLocalStorage('mis_predicciones_2026', {});
@@ -54,7 +67,7 @@ const PredictionScreen = ({ readOnly = false }) => {
   const [isDirty, setIsDirty] = useState(false);
   const [toast, setToast] = useState(null);
 
-  // ✅ NUEVO: special picks del usuario autenticado (vienen de Firestore, no localStorage)
+  // Special picks del usuario autenticado (vienen de Firestore, no localStorage)
   const [savedSpecialPicks, setSavedSpecialPicks] = useState({});
 
   // Estado modo lectura
@@ -80,7 +93,7 @@ const PredictionScreen = ({ readOnly = false }) => {
     loadUserData();
   }, [uid, readOnly]);
 
-  // ✅ NUEVO: carga los special picks del usuario autenticado al montar
+  // Carga los special picks del usuario autenticado al montar
   useEffect(() => {
     if (readOnly || !user) return;
     getUserPredictions(user.uid).then(result => {
@@ -114,7 +127,7 @@ const PredictionScreen = ({ readOnly = false }) => {
     setIsSyncing(false);
   };
 
-  // ✅ NUEVO: guarda los special picks directo a Firestore
+  // Guarda los special picks directo a Firestore
   const handleSaveSpecialPicks = async (picks) => {
     if (!user) return { success: false };
     const result = await saveSpecialPicks(user.uid, picks, user);
@@ -275,7 +288,8 @@ const PredictionScreen = ({ readOnly = false }) => {
                       key={match.id}
                       match={match}
                       onSave={handleSavePrediction}
-                      savedPrediction={activePredictions[match.id]}
+                      // ✅ FIX: en modo lectura, oculta predicciones de partidos no iniciados
+                      savedPrediction={getPredictionForView(match, activePredictions, readOnly)}
                       readOnly={readOnly}
                     />
                   ))}
@@ -313,7 +327,8 @@ const PredictionScreen = ({ readOnly = false }) => {
                   <MatchCard
                     match={liveMatch}
                     onSave={handleSavePrediction}
-                    savedPrediction={activePredictions[liveMatch.id]}
+                    // ✅ FIX: en modo lectura, oculta predicciones de partidos no iniciados
+                    savedPrediction={getPredictionForView(liveMatch, activePredictions, readOnly)}
                     readOnly={readOnly}
                   />
                 </div>
