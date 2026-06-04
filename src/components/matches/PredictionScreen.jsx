@@ -33,6 +33,12 @@ const getPredictionForView = (match, predictions, readOnly) => {
   return isMatchStarted(match) ? predictions[match.id] : null;
 };
 
+// ✅ Los picks especiales solo se revelan después de la Final
+// Final: Jul 19 2026 19:00 UTC = 2:00 PM COT
+const isTournamentOver = () => {
+  return new Date() > new Date('2026-07-19T19:00:00Z');
+};
+
 // ─── Toast ───────────────────────────────────────────────────────────────────
 const Toast = ({ message, type, onClose }) => {
   useEffect(() => {
@@ -252,9 +258,10 @@ const PredictionScreen = ({ readOnly = false }) => {
       <div className="p-4 max-w-2xl mx-auto">
 
         {/* ─── PICKS ESPECIALES ────────────────────────────────────────────── */}
+        {/* ✅ FIX: en modo lectura, los picks especiales solo se revelan tras la Final */}
         <SpecialPicks
           savedPicks={readOnly
-            ? (viewedPredictions?.specialPicks || {})
+            ? (isTournamentOver() ? (viewedPredictions?.specialPicks || {}) : {})
             : savedSpecialPicks
           }
           officialSpecial={officialSpecial}
