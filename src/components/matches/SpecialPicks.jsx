@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, Crosshair, Shield, CheckCircle, AlertCircle } from 'lucide-react';
+import { Trophy, Crosshair, Shield, CheckCircle, AlertCircle, Lock } from 'lucide-react';
 
 const CATEGORIES = [
   {
@@ -31,7 +31,8 @@ const CATEGORIES = [
   },
 ];
 
-const SpecialPicks = ({ savedPicks = {}, officialSpecial = {}, onSave, readOnly = false }) => {
+// ✅ Nueva prop: tournamentOver — indica si la Final ya se jugó
+const SpecialPicks = ({ savedPicks = {}, officialSpecial = {}, onSave, readOnly = false, tournamentOver = false }) => {
   const [picks, setPicks] = useState({
     champion: savedPicks.champion || '',
     topScorer: savedPicks.topScorer || '',
@@ -92,45 +93,60 @@ const SpecialPicks = ({ savedPicks = {}, officialSpecial = {}, onSave, readOnly 
         </div>
       </div>
 
-      <div className="space-y-3">
-        {CATEGORIES.map(({ key, label, placeholder, icon: Icon, bg, iconBg }) => (
-          <div key={key} className={`bg-white rounded-3xl p-4 shadow-sm border ${readOnly ? 'border-gray-100' : 'border-gray-100'}`}>
-            <div className="flex items-center gap-3 mb-3">
-              <div className={`p-2 ${iconBg} rounded-xl`}>
-                <Icon size={16} className="text-white" />
+      {/* ✅ En modo lectura antes de la Final: bloqueo global con mensaje */}
+      {readOnly && !tournamentOver ? (
+        <div className="bg-yellow-50 border-2 border-yellow-200 rounded-3xl p-6 flex flex-col items-center justify-center gap-3 text-center">
+          <Lock size={28} className="text-yellow-400" />
+          <p className="font-black text-yellow-600 text-sm uppercase tracking-widest">
+            🔒 Disponible tras la Final
+          </p>
+          <p className="text-yellow-500 text-[11px] font-bold">
+            Los picks especiales se revelan el 19 de julio después de la Final
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="space-y-3">
+            {CATEGORIES.map(({ key, label, placeholder, icon: Icon, bg, iconBg }) => (
+              <div key={key} className="bg-white rounded-3xl p-4 shadow-sm border border-gray-100">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className={`p-2 ${iconBg} rounded-xl`}>
+                    <Icon size={16} className="text-white" />
+                  </div>
+                  <div className="flex items-center gap-2 flex-1">
+                    <span className="font-black text-gray-700 text-xs uppercase tracking-widest">{label}</span>
+                    {getResultBadge(key)}
+                  </div>
+                </div>
+                {readOnly ? (
+                  <div className={`p-3 rounded-xl border ${bg}`}>
+                    <p className="font-black text-gray-800 text-sm">
+                      {picks[key] || <span className="text-gray-300 font-normal italic">Sin pronóstico</span>}
+                    </p>
+                  </div>
+                ) : (
+                  <input
+                    type="text"
+                    value={picks[key]}
+                    onChange={e => setPicks(prev => ({ ...prev, [key]: e.target.value }))}
+                    placeholder={placeholder}
+                    className="w-full p-3 bg-gray-50 rounded-xl font-bold text-sm border border-gray-200 focus:ring-2 focus:ring-yellow-400 focus:border-transparent outline-none transition"
+                  />
+                )}
               </div>
-              <div className="flex items-center gap-2 flex-1">
-                <span className="font-black text-gray-700 text-xs uppercase tracking-widest">{label}</span>
-                {getResultBadge(key)}
-              </div>
-            </div>
-            {readOnly ? (
-              <div className={`p-3 rounded-xl border ${bg}`}>
-                <p className="font-black text-gray-800 text-sm">
-                  {picks[key] || <span className="text-gray-300 font-normal italic">Sin pronóstico</span>}
-                </p>
-              </div>
-            ) : (
-              <input
-                type="text"
-                value={picks[key]}
-                onChange={e => setPicks(prev => ({ ...prev, [key]: e.target.value }))}
-                placeholder={placeholder}
-                className="w-full p-3 bg-gray-50 rounded-xl font-bold text-sm border border-gray-200 focus:ring-2 focus:ring-yellow-400 focus:border-transparent outline-none transition"
-              />
-            )}
+            ))}
           </div>
-        ))}
-      </div>
 
-      {!readOnly && (
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="w-full mt-4 bg-yellow-500 hover:bg-yellow-600 text-white py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-yellow-100"
-        >
-          {saving ? 'GUARDANDO...' : 'GUARDAR PICKS ESPECIALES ⭐'}
-        </button>
+          {!readOnly && (
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="w-full mt-4 bg-yellow-500 hover:bg-yellow-600 text-white py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-yellow-100"
+            >
+              {saving ? 'GUARDANDO...' : 'GUARDAR PICKS ESPECIALES ⭐'}
+            </button>
+          )}
+        </>
       )}
     </div>
   );

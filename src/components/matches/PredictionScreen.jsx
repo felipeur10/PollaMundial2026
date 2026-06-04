@@ -265,6 +265,7 @@ const PredictionScreen = ({ readOnly = false }) => {
             : savedSpecialPicks
           }
           officialSpecial={officialSpecial}
+          tournamentOver={isTournamentOver()}
           onSave={handleSaveSpecialPicks}
           readOnly={readOnly}
         />
