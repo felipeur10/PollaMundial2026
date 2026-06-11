@@ -33,10 +33,10 @@ const getPredictionForView = (match, predictions, readOnly) => {
   return isMatchStarted(match) ? predictions[match.id] : null;
 };
 
-// ✅ Los picks especiales solo se revelan después de la Final
-// Final: Jul 19 2026 19:00 UTC = 2:00 PM COT
-const isTournamentOver = () => {
-  return new Date() > new Date('2026-07-19T19:00:00Z');
+// ✅ Los special picks se bloquean y revelan al pitazo inicial del torneo
+// Jun 11 2026 19:00 UTC = 2:00 PM COT
+const isPicksLocked = () => {
+  return new Date() > new Date('2026-06-11T19:00:00Z');
 };
 
 // ─── Toast ───────────────────────────────────────────────────────────────────
@@ -258,14 +258,15 @@ const PredictionScreen = ({ readOnly = false }) => {
       <div className="p-4 max-w-2xl mx-auto">
 
         {/* ─── PICKS ESPECIALES ────────────────────────────────────────────── */}
-        {/* ✅ FIX: en modo lectura, los picks especiales solo se revelan tras la Final */}
+        {/* ✅ En modo lectura: se revelan cuando arranca el torneo (isPicksLocked)
+            En modo edición: se bloquean cuando arranca el torneo (manejado en SpecialPicks.jsx) */}
         <SpecialPicks
           savedPicks={readOnly
-            ? (isTournamentOver() ? (viewedPredictions?.specialPicks || {}) : {})
+            ? (isPicksLocked() ? (viewedPredictions?.specialPicks || {}) : {})
             : savedSpecialPicks
           }
           officialSpecial={officialSpecial}
-          tournamentOver={isTournamentOver()}
+          tournamentOver={isPicksLocked()}
           onSave={handleSaveSpecialPicks}
           readOnly={readOnly}
         />
@@ -296,7 +297,7 @@ const PredictionScreen = ({ readOnly = false }) => {
                       key={match.id}
                       match={match}
                       onSave={handleSavePrediction}
-                      // ✅ FIX: en modo lectura, oculta predicciones de partidos no iniciados
+                      // ✅ En modo lectura, oculta predicciones de partidos no iniciados
                       savedPrediction={getPredictionForView(match, activePredictions, readOnly)}
                       readOnly={readOnly}
                     />
@@ -335,7 +336,7 @@ const PredictionScreen = ({ readOnly = false }) => {
                   <MatchCard
                     match={liveMatch}
                     onSave={handleSavePrediction}
-                    // ✅ FIX: en modo lectura, oculta predicciones de partidos no iniciados
+                    // ✅ En modo lectura, oculta predicciones de partidos no iniciados
                     savedPrediction={getPredictionForView(liveMatch, activePredictions, readOnly)}
                     readOnly={readOnly}
                   />
