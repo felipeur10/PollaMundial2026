@@ -6,7 +6,7 @@ const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
   
   // REEMPLAZA ESTO CON TU CORREO REAL DE GOOGLE
-  const ADMIN_EMAIL = "felipeurrego.rincon@gmail.com"; 
+  const ADMIN_EMAIL = "idekisora@gmail.com"; 
 
   if (loading) return <div className="p-10 text-center font-black italic">Verificando Credenciales...</div>;
 
