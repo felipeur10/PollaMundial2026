@@ -31,7 +31,16 @@ const CATEGORIES = [
   },
 ];
 
-// ✅ Nueva prop: tournamentOver — indica si la Final ya se jugó
+// ✅ Se bloquea la edición al pitazo inicial del torneo (Jun 11 19:00 UTC = 2:00 PM COT)
+const isPicksLocked = () => {
+  return new Date() > new Date('2026-06-11T19:00:00Z');
+};
+
+// ✅ Los picks especiales de otros solo se revelan después de la Final (Jul 19 19:00 UTC)
+const isTournamentOver = () => {
+  return new Date() > new Date('2026-07-19T19:00:00Z');
+};
+
 const SpecialPicks = ({ savedPicks = {}, officialSpecial = {}, onSave, readOnly = false, tournamentOver = false }) => {
   const [picks, setPicks] = useState({
     champion: savedPicks.champion || '',
@@ -40,6 +49,8 @@ const SpecialPicks = ({ savedPicks = {}, officialSpecial = {}, onSave, readOnly 
   });
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState(null);
+
+  const locked = isPicksLocked();
 
   // Sincronizar si llegan savedPicks nuevos (modo lectura)
   useEffect(() => {
@@ -93,7 +104,7 @@ const SpecialPicks = ({ savedPicks = {}, officialSpecial = {}, onSave, readOnly 
         </div>
       </div>
 
-      {/* ✅ En modo lectura antes de la Final: bloqueo global con mensaje */}
+      {/* ✅ Modo lectura: bloqueo hasta la Final */}
       {readOnly && !tournamentOver ? (
         <div className="bg-yellow-50 border-2 border-yellow-200 rounded-3xl p-6 flex flex-col items-center justify-center gap-3 text-center">
           <Lock size={28} className="text-yellow-400" />
@@ -106,9 +117,24 @@ const SpecialPicks = ({ savedPicks = {}, officialSpecial = {}, onSave, readOnly 
         </div>
       ) : (
         <>
+          {/* ✅ Modo edición bloqueado: torneo ya arrancó */}
+          {!readOnly && locked && (
+            <div className="bg-gray-50 border-2 border-gray-200 rounded-3xl p-5 flex items-center gap-4 mb-4">
+              <Lock size={22} className="text-gray-400 shrink-0" />
+              <div>
+                <p className="font-black text-gray-600 text-sm uppercase tracking-widest">
+                  🔒 Mercado cerrado
+                </p>
+                <p className="text-gray-400 text-[11px] font-bold mt-0.5">
+                  Los picks especiales se bloquearon al inicio del torneo
+                </p>
+              </div>
+            </div>
+          )}
+
           <div className="space-y-3">
             {CATEGORIES.map(({ key, label, placeholder, icon: Icon, bg, iconBg }) => (
-              <div key={key} className="bg-white rounded-3xl p-4 shadow-sm border border-gray-100">
+              <div key={key} className={`bg-white rounded-3xl p-4 shadow-sm border border-gray-100 ${!readOnly && locked ? 'opacity-60' : ''}`}>
                 <div className="flex items-center gap-3 mb-3">
                   <div className={`p-2 ${iconBg} rounded-xl`}>
                     <Icon size={16} className="text-white" />
@@ -118,7 +144,9 @@ const SpecialPicks = ({ savedPicks = {}, officialSpecial = {}, onSave, readOnly 
                     {getResultBadge(key)}
                   </div>
                 </div>
-                {readOnly ? (
+
+                {/* ✅ Modo lectura o edición bloqueada: mostrar valor como texto */}
+                {readOnly || locked ? (
                   <div className={`p-3 rounded-xl border ${bg}`}>
                     <p className="font-black text-gray-800 text-sm">
                       {picks[key] || <span className="text-gray-300 font-normal italic">Sin pronóstico</span>}
@@ -137,7 +165,8 @@ const SpecialPicks = ({ savedPicks = {}, officialSpecial = {}, onSave, readOnly 
             ))}
           </div>
 
-          {!readOnly && (
+          {/* ✅ Botón guardar: solo visible si no es readOnly y no está bloqueado */}
+          {!readOnly && !locked && (
             <button
               onClick={handleSave}
               disabled={saving}
