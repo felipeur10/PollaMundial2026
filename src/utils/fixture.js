@@ -32,7 +32,7 @@ export const fixture = [
   // ── GRUPO D: Estados Unidos · Paraguay · Australia · Turquía ──────────────
   { id: 'm04', group: 'D', home: 'Estados Unidos',  away: 'Paraguay',         date: '2026-06-13T01:00:00Z', phase: 'grupos' },
   { id: 'm05', group: 'D', home: 'Australia',       away: 'Turquía',          date: '2026-06-14T04:00:00Z', phase: 'grupos' },
-  { id: 'm29', group: 'D', home: 'Turquía',         away: 'Paraguay',         date: '2026-06-19T04:00:00Z', phase: 'grupos' },
+  { id: 'm29', group: 'D', home: 'Turquía',         away: 'Paraguay',         date: '2026-06-20T03:00:00Z', phase: 'grupos' },
   { id: 'm30', group: 'D', home: 'Estados Unidos',  away: 'Australia',        date: '2026-06-19T19:00:00Z', phase: 'grupos' },
   { id: 'm59', group: 'D', home: 'Turquía',         away: 'Estados Unidos',   date: '2026-06-26T02:00:00Z', phase: 'grupos' },
   { id: 'm60', group: 'D', home: 'Paraguay',        away: 'Australia',        date: '2026-06-26T02:00:00Z', phase: 'grupos' },
@@ -100,4 +100,4 @@ export const fixture = [
   { id: 'm47', group: 'L', home: 'Panamá',          away: 'Croacia',          date: '2026-06-23T23:00:00Z', phase: 'grupos' },
   { id: 'm67', group: 'L', home: 'Panamá',          away: 'Inglaterra',       date: '2026-06-27T21:00:00Z', phase: 'grupos' },
   { id: 'm68', group: 'L', home: 'Croacia',         away: 'Ghana',            date: '2026-06-27T21:00:00Z', phase: 'grupos' },
-];
+];  
