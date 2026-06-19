@@ -123,7 +123,19 @@ const PredictionScreen = ({ readOnly = false }) => {
   const handleUpload = async () => {
     if (!user) return setToast({ message: 'Inicia sesión primero', type: 'error' });
     setIsSyncing(true);
-    const result = await saveAllPredictions(user.uid, userPredictions, user);
+
+    // ✅ FIX: leer directo de localStorage como fuente de verdad
+    // Evita condición de carrera en móvil donde el estado de React
+    // puede no estar actualizado cuando el usuario toca "Enviar" rápido
+    let predictionsToSave = userPredictions;
+    try {
+      const raw = window.localStorage.getItem('mis_predicciones_2026');
+      if (raw) predictionsToSave = JSON.parse(raw);
+    } catch (e) {
+      console.error('Error leyendo localStorage:', e);
+    }
+
+    const result = await saveAllPredictions(user.uid, predictionsToSave, user);
     setToast(
       result.success
         ? { message: '¡Pronósticos guardados! 🏆', type: 'success' }
@@ -258,8 +270,6 @@ const PredictionScreen = ({ readOnly = false }) => {
       <div className="p-4 max-w-2xl mx-auto">
 
         {/* ─── PICKS ESPECIALES ────────────────────────────────────────────── */}
-        {/* ✅ En modo lectura: se revelan cuando arranca el torneo (isPicksLocked)
-            En modo edición: se bloquean cuando arranca el torneo (manejado en SpecialPicks.jsx) */}
         <SpecialPicks
           savedPicks={readOnly
             ? (isPicksLocked() ? (viewedPredictions?.specialPicks || {}) : {})
@@ -297,7 +307,6 @@ const PredictionScreen = ({ readOnly = false }) => {
                       key={match.id}
                       match={match}
                       onSave={handleSavePrediction}
-                      // ✅ En modo lectura, oculta predicciones de partidos no iniciados
                       savedPrediction={getPredictionForView(match, activePredictions, readOnly)}
                       readOnly={readOnly}
                     />
@@ -336,7 +345,6 @@ const PredictionScreen = ({ readOnly = false }) => {
                   <MatchCard
                     match={liveMatch}
                     onSave={handleSavePrediction}
-                    // ✅ En modo lectura, oculta predicciones de partidos no iniciados
                     savedPrediction={getPredictionForView(liveMatch, activePredictions, readOnly)}
                     readOnly={readOnly}
                   />
