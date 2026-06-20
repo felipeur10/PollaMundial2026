@@ -48,7 +48,7 @@ export const fixture = [
   // ── GRUPO F: Países Bajos · Japón · Suecia · Túnez ───────────────────────
   { id: 'm10', group: 'F', home: 'Países Bajos',   away: 'Japón',            date: '2026-06-14T20:00:00Z', phase: 'grupos' },
   { id: 'm12', group: 'F', home: 'Suecia',          away: 'Túnez',            date: '2026-06-15T02:00:00Z', phase: 'grupos' },
-  { id: 'm33', group: 'F', home: 'Túnez',           away: 'Japón',            date: '2026-06-20T04:00:00Z', phase: 'grupos' },
+  { id: 'm33', group: 'F', home: 'Túnez',           away: 'Japón',            date: '2026-06-21T04:00:00Z', phase: 'grupos' },
   { id: 'm34', group: 'F', home: 'Países Bajos',   away: 'Suecia',           date: '2026-06-20T17:00:00Z', phase: 'grupos' },
   { id: 'm57', group: 'F', home: 'Japón',           away: 'Suecia',           date: '2026-06-25T23:00:00Z', phase: 'grupos' },
   { id: 'm58', group: 'F', home: 'Túnez',           away: 'Países Bajos',    date: '2026-06-25T23:00:00Z', phase: 'grupos' },
