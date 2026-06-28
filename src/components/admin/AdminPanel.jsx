@@ -6,18 +6,14 @@ import { knockoutFixture } from '../../utils/KnockoutFixture';
 import { Trophy, Settings, Users, Zap, CheckCircle } from 'lucide-react';
 
 const AdminPanel = () => {
-  // ✅ Estado para resultados — cargados desde Firestore
   const [results, setResults] = useState({});
-  // ✅ Estado para equipos de knockout — cargados desde Firestore
   const [teams, setTeams] = useState({});
-  // ✅ Estado para picks especiales — cargados desde Firestore
   const [specialPicks, setSpecialPicks] = useState({
     champion: '',
     topScorer: '',
     bestGoalkeeper: '',
   });
 
-  // ✅ Cargar resultados desde Firestore al montar
   useEffect(() => {
     const unsubResults = onSnapshot(collection(db, "results"), (snapshot) => {
       const data = {};
@@ -67,17 +63,33 @@ const AdminPanel = () => {
   };
 
   // 2. PUBLICAR RESULTADOS
-  const saveOfficialResult = async (matchId) => {
+  const saveOfficialResult = async (matchId, isKnockout) => {
     const hScore = results[matchId]?.homeInput ?? '';
     const aScore = results[matchId]?.awayInput ?? '';
     if (hScore === '' || aScore === '') return alert("Ingresa el marcador oficial");
+
+    const isDrawn = Number(hScore) === Number(aScore);
+
+    // ✅ En knockout con empate, exigir que se indique quien avanzó
+    if (isKnockout && isDrawn) {
+      const advances = results[matchId]?.advances;
+      if (!advances) return alert("Es un empate en eliminatorias — indica quién avanzó antes de publicar.");
+    }
+
     try {
-      await setDoc(doc(db, "results", matchId), {
+      const dataToSave = {
         homeScore: Number(hScore),
         awayScore: Number(aScore),
         status: 'finished',
         publishedAt: new Date().toISOString()
-      });
+      };
+
+      // ✅ Guardar advances solo si es knockout con empate
+      if (isKnockout && isDrawn) {
+        dataToSave.advances = results[matchId].advances;
+      }
+
+      await setDoc(doc(db, "results", matchId), dataToSave);
       alert("Resultado publicado. ¡Ranking actualizado para todos! 📣");
     } catch (e) {
       console.error(e);
@@ -102,8 +114,6 @@ const AdminPanel = () => {
     }
   };
 
-  // Helper: valor del input de resultado (prioriza lo que el admin está editando,
-  // si no hay edición pendiente muestra el valor guardado en Firestore)
   const getHomeValue = (matchId) => {
     if (results[matchId]?.homeInput !== undefined) return results[matchId].homeInput;
     if (results[matchId]?.homeScore !== undefined) return results[matchId].homeScore;
@@ -116,6 +126,20 @@ const AdminPanel = () => {
   };
 
   const isPublished = (matchId) => results[matchId]?.status === 'finished';
+
+  // ✅ Helper: detectar si es empate en el input actual
+  const isCurrentDraw = (matchId) => {
+    const h = getHomeValue(matchId);
+    const a = getAwayValue(matchId);
+    return h !== '' && a !== '' && Number(h) === Number(a);
+  };
+
+  // ✅ Nombres reales del partido (desde official_fixture o placeholder del knockoutFixture)
+  const getMatchName = (match) => {
+    const home = teams[match.id]?.home || match.home;
+    const away = teams[match.id]?.away || match.away;
+    return { home, away };
+  };
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen pb-20">
@@ -162,7 +186,6 @@ const AdminPanel = () => {
                     className="flex-1 p-3 bg-gray-50 rounded-xl font-bold text-xs border focus:ring-2 focus:ring-blue-500 outline-none"
                   />
                 </div>
-                {/* ✅ Muestra los nombres ya guardados */}
                 {teams[match.id]?.home && (
                   <p className="text-[10px] text-green-600 font-bold mt-2 flex items-center gap-1">
                     <CheckCircle size={10} /> Guardado: {teams[match.id].home} vs {teams[match.id].away}
@@ -187,59 +210,109 @@ const AdminPanel = () => {
           </div>
 
           <div className="bg-white rounded-[32px] shadow-sm border border-gray-200 overflow-hidden">
-            {[...fixture, ...knockoutFixture].map((match, index) => (
-              <div
-                key={match.id}
-                className={`flex items-center justify-between p-6 ${
-                  isPublished(match.id) ? 'bg-green-50' : index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'
-                } border-b border-gray-100 last:border-0`}
-              >
-                <div className="flex-1">
-                  <p className="text-[9px] font-black text-blue-500 uppercase">{match.group || match.phase}</p>
-                  <p className="font-black text-sm text-gray-800 uppercase italic tracking-tighter">
-                    {match.home} vs {match.away}
-                  </p>
-                  {/* ✅ Muestra badge si ya fue publicado */}
-                  {isPublished(match.id) && (
-                    <p className="text-[10px] text-green-600 font-bold flex items-center gap-1 mt-0.5">
-                      <CheckCircle size={10} /> Publicado: {results[match.id].homeScore} - {results[match.id].awayScore}
-                    </p>
+            {[...fixture, ...knockoutFixture].map((match, index) => {
+              const isKnockout = !match.group;
+              const showAdvances = isKnockout && isCurrentDraw(match.id);
+              const { home, away } = getMatchName(match);
+
+              return (
+                <div
+                  key={match.id}
+                  className={`p-6 ${
+                    isPublished(match.id) ? 'bg-green-50' : index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'
+                  } border-b border-gray-100 last:border-0`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <p className="text-[9px] font-black text-blue-500 uppercase">{match.group || match.phase}</p>
+                      <p className="font-black text-sm text-gray-800 uppercase italic tracking-tighter">
+                        {home} vs {away}
+                      </p>
+                      {isPublished(match.id) && (
+                        <p className="text-[10px] text-green-600 font-bold flex items-center gap-1 mt-0.5">
+                          <CheckCircle size={10} />
+                          Publicado: {results[match.id].homeScore} - {results[match.id].awayScore}
+                          {results[match.id].advances && (
+                            <span className="ml-1 text-blue-600">
+                              · Avanzó: {results[match.id].advances === 'home' ? home : away}
+                            </span>
+                          )}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center bg-gray-100 rounded-2xl p-1 border">
+                        <input
+                          type="number"
+                          placeholder="0"
+                          value={getHomeValue(match.id)}
+                          onChange={e => setResults(prev => ({
+                            ...prev,
+                            [match.id]: { ...prev[match.id], homeInput: e.target.value }
+                          }))}
+                          className="w-10 h-10 text-center font-black bg-transparent outline-none text-blue-600"
+                        />
+                        <span className="text-gray-400 font-bold mx-1">:</span>
+                        <input
+                          type="number"
+                          placeholder="0"
+                          value={getAwayValue(match.id)}
+                          onChange={e => setResults(prev => ({
+                            ...prev,
+                            [match.id]: { ...prev[match.id], awayInput: e.target.value }
+                          }))}
+                          className="w-10 h-10 text-center font-black bg-transparent outline-none text-red-600"
+                        />
+                      </div>
+                      <button
+                        onClick={() => saveOfficialResult(match.id, isKnockout)}
+                        className="bg-green-500 text-white w-12 h-12 rounded-2xl flex items-center justify-center hover:bg-green-600 transition shadow-lg shadow-green-100 active:scale-90"
+                      >
+                        <Zap size={18} fill="currentColor" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* ✅ Selector de quien avanzó — solo aparece en knockout con empate */}
+                  {showAdvances && (
+                    <div className="mt-4 p-4 bg-blue-50 rounded-2xl border border-blue-100">
+                      <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-3">
+                        ⚽ Empate en eliminatorias — ¿Quién avanzó?
+                      </p>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => setResults(prev => ({
+                            ...prev,
+                            [match.id]: { ...prev[match.id], advances: 'home' }
+                          }))}
+                          className={`flex-1 py-3 rounded-xl font-black text-xs uppercase transition-all ${
+                            results[match.id]?.advances === 'home'
+                              ? 'bg-blue-600 text-white shadow-lg'
+                              : 'bg-white text-gray-500 border border-gray-200'
+                          }`}
+                        >
+                          {home}
+                        </button>
+                        <button
+                          onClick={() => setResults(prev => ({
+                            ...prev,
+                            [match.id]: { ...prev[match.id], advances: 'away' }
+                          }))}
+                          className={`flex-1 py-3 rounded-xl font-black text-xs uppercase transition-all ${
+                            results[match.id]?.advances === 'away'
+                              ? 'bg-blue-600 text-white shadow-lg'
+                              : 'bg-white text-gray-500 border border-gray-200'
+                          }`}
+                        >
+                          {away}
+                        </button>
+                      </div>
+                    </div>
                   )}
                 </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center bg-gray-100 rounded-2xl p-1 border">
-                    <input
-                      type="number"
-                      placeholder="0"
-                      value={getHomeValue(match.id)}
-                      onChange={e => setResults(prev => ({
-                        ...prev,
-                        [match.id]: { ...prev[match.id], homeInput: e.target.value }
-                      }))}
-                      className="w-10 h-10 text-center font-black bg-transparent outline-none text-blue-600"
-                    />
-                    <span className="text-gray-400 font-bold mx-1">:</span>
-                    <input
-                      type="number"
-                      placeholder="0"
-                      value={getAwayValue(match.id)}
-                      onChange={e => setResults(prev => ({
-                        ...prev,
-                        [match.id]: { ...prev[match.id], awayInput: e.target.value }
-                      }))}
-                      className="w-10 h-10 text-center font-black bg-transparent outline-none text-red-600"
-                    />
-                  </div>
-                  <button
-                    onClick={() => saveOfficialResult(match.id)}
-                    className="bg-green-500 text-white w-12 h-12 rounded-2xl flex items-center justify-center hover:bg-green-600 transition shadow-lg shadow-green-100 active:scale-90"
-                  >
-                    <Zap size={18} fill="currentColor" />
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
 
