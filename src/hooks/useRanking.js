@@ -28,12 +28,40 @@ export const useRanking = (officialResults, officialSpecial = {}) => {
 
           if (pred && real) {
             const isExact = pred.homeScore === real.homeScore && pred.awayScore === real.awayScore;
-            const realWinner = real.homeScore > real.awayScore ? 'home' : real.homeScore < real.awayScore ? 'away' : 'draw';
-            const predWinner = pred.homeScore > pred.awayScore ? 'home' : pred.homeScore < pred.awayScore ? 'away' : 'draw';
+
+            const realWinner = real.homeScore > real.awayScore ? 'home'
+              : real.homeScore < real.awayScore ? 'away'
+              : 'draw';
+
+            const predWinner = pred.homeScore > pred.awayScore ? 'home'
+              : pred.homeScore < pred.awayScore ? 'away'
+              : 'draw';
 
             if (isExact) {
+              // ✅ Marcador exacto: +5 pts siempre, sin importar advances
               totalPoints += 5;
+            } else if (realWinner === 'draw' && predWinner === 'draw') {
+              // ✅ FIX: ambos predijeron empate pero marcador diferente
+              // En eliminatorias: solo suma 2 pts si acertó quién avanza
+              // En grupos: empate es resultado válido, suma 2 pts directamente
+              const isKnockout = (() => {
+                const allMatches = [...fixture];
+                const m = allMatches.find(f => f.id === matchId);
+                return !m; // si no está en fixture de grupos, es knockout
+              })();
+
+              if (isKnockout) {
+                // Eliminatorias: verificar quién avanza
+                if (pred.advances && real.advances && pred.advances === real.advances) {
+                  totalPoints += 2;
+                }
+                // Si falla quién avanza → 0 pts
+              } else {
+                // Grupos: empate es resultado final, suma 2 pts
+                totalPoints += 2;
+              }
             } else if (realWinner === predWinner) {
+              // Acertó ganador (no empate) pero marcador diferente → +2 pts
               totalPoints += 2;
             }
           }
@@ -44,7 +72,6 @@ export const useRanking = (officialResults, officialSpecial = {}) => {
           const userTable = calculateGroupTable(groupLetter, fixture, userPredictions);
           const realTable = calculateGroupTable(groupLetter, fixture, officialResults);
 
-          // ✅ FIX: usar "p" en vez de "pld" — coincide con el campo en groupLogic.js
           const isGroupFinished = realTable.every(t => t.p === 3);
 
           if (isGroupFinished && realTable.length >= 2 && userTable.length >= 2) {
@@ -61,7 +88,6 @@ export const useRanking = (officialResults, officialSpecial = {}) => {
         const realBestThirds = getBestThirdPlaces(groups, fixture, officialResults).map(t => t.name);
         const userBestThirds = getBestThirdPlaces(groups, fixture, userPredictions).map(t => t.name);
 
-        // Filtrar solo partidos de fase de grupos
         const groupMatchIds = Object.keys(officialResults).filter(id => {
           const match = fixture.find(m => m.id === id);
           return match?.phase === 'grupos';
