@@ -27,8 +27,9 @@ export const knockoutFixture = [
   { id: 'm76', phase: 'Ronda de 32', home: '1° Grupo C',  away: '2° Grupo F',            date: '2026-06-30T01:00:00Z' },
 
   // Martes 30 de Junio
-  { id: 'm77', phase: 'Ronda de 32', home: '1° Grupo I',  away: 'Mejor 3° (C/D/F/G/H)', date: '2026-06-30T21:00:00Z' },
-  { id: 'm78', phase: 'Ronda de 32', home: '2° Grupo E',  away: '2° Grupo I',            date: '2026-06-30T17:00:00Z' },
+  // DESPUÉS (correcto)
+  { id: 'm77', phase: 'Ronda de 32', home: '1° Grupo I',  away: 'Mejor 3° (C/D/F/G/H)', date: '2026-06-30T17:00:00Z' }, // 12:00 PM COT
+  { id: 'm78', phase: 'Ronda de 32', home: '2° Grupo E',  away: '2° Grupo I',            date: '2026-06-30T21:00:00Z' }, // 4:00 PM COT
   { id: 'm79', phase: 'Ronda de 32', home: '1° Grupo A',  away: 'Mejor 3° (C/E/F/H/I)', date: '2026-07-01T01:00:00Z' },
 
   // Miércoles 1 de Julio
