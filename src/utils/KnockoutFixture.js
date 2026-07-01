@@ -34,9 +34,8 @@ export const knockoutFixture = [
 
   // Miércoles 1 de Julio
   { id: 'm80', phase: 'Ronda de 32', home: '1° Grupo L',  away: 'Mejor 3° (E/H/I/J/K)', date: '2026-07-01T16:00:00Z' },
-  { id: 'm81', phase: 'Ronda de 32', home: '1° Grupo D',  away: 'Mejor 3° (B/E/F/I/J)', date: '2026-07-02T00:00:00Z' },
-  { id: 'm82', phase: 'Ronda de 32', home: '1° Grupo G',  away: 'Mejor 3° (A/E/H/I/J)', date: '2026-07-01T20:00:00Z' },
-
+  { id: 'm81', phase: 'Ronda de 32', home: '1° Grupo D',  away: 'Mejor 3° (B/E/F/I/J)', date: '2026-07-01T20:00:00Z' },
+  { id: 'm82', phase: 'Ronda de 32', home: '1° Grupo G',  away: 'Mejor 3° (A/E/H/I/J)', date: '2026-07-02T00:00:00Z' },
   // Jueves 2 de Julio
   { id: 'm83', phase: 'Ronda de 32', home: '2° Grupo K',  away: '2° Grupo L',            date: '2026-07-02T23:00:00Z' },
   { id: 'm84', phase: 'Ronda de 32', home: '1° Grupo H',  away: '2° Grupo J',            date: '2026-07-02T19:00:00Z' },
