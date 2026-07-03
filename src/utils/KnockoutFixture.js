@@ -50,21 +50,15 @@ export const knockoutFixture = [
   // OCTAVOS DE FINAL  (Jul 4 – Jul 7)
   // ══════════════════════════════════════════════════════════════════════════
 
-  // Sábado 4 de Julio
-  { id: 'm89', phase: 'Octavos de Final', home: 'Ganador M74', away: 'Ganador M77', date: '2026-07-04T21:00:00Z' },
-  { id: 'm90', phase: 'Octavos de Final', home: 'Ganador M73', away: 'Ganador M75', date: '2026-07-04T17:00:00Z' },
+  { id: 'm89', phase: 'Octavos de Final', home: 'Ganador M75', away: 'Ganador M78', date: '2026-07-04T21:00:00Z' }, // 5PM ET Jul 4
+  { id: 'm90', phase: 'Octavos de Final', home: 'Ganador M73', away: 'Ganador M76', date: '2026-07-04T17:00:00Z' }, // 1PM ET Jul 4
+  { id: 'm91', phase: 'Octavos de Final', home: 'Ganador M74', away: 'Ganador M77', date: '2026-07-05T20:00:00Z' }, // 4PM ET Jul 5
+  { id: 'm92', phase: 'Octavos de Final', home: 'Ganador M79', away: 'Ganador M80', date: '2026-07-06T00:00:00Z' }, // 8PM ET Jul 5
+  { id: 'm93', phase: 'Octavos de Final', home: 'Ganador M83', away: 'Ganador M84', date: '2026-07-06T19:00:00Z' }, // 3PM ET Jul 6
+  { id: 'm94', phase: 'Octavos de Final', home: 'Ganador M81', away: 'Ganador M82', date: '2026-07-07T00:00:00Z' }, // 8PM ET Jul 6
+  { id: 'm95', phase: 'Octavos de Final', home: 'Ganador M86', away: 'Ganador M85', date: '2026-07-07T16:00:00Z' }, // 12PM ET Jul 7
+  { id: 'm96', phase: 'Octavos de Final', home: 'Ganador M87', away: 'Ganador M88', date: '2026-07-07T20:00:00Z' }, // 4PM ET Jul 7
 
-  // Domingo 5 de Julio
-  { id: 'm91', phase: 'Octavos de Final', home: 'Ganador M76', away: 'Ganador M78', date: '2026-07-05T20:00:00Z' },
-  { id: 'm92', phase: 'Octavos de Final', home: 'Ganador M79', away: 'Ganador M80', date: '2026-07-06T00:00:00Z' },
-
-  // Lunes 6 de Julio
-  { id: 'm93', phase: 'Octavos de Final', home: 'Ganador M83', away: 'Ganador M84', date: '2026-07-06T18:00:00Z' },
-  { id: 'm94', phase: 'Octavos de Final', home: 'Ganador M81', away: 'Ganador M82', date: '2026-07-06T22:00:00Z' },
-
-  // Martes 7 de Julio
-  { id: 'm95', phase: 'Octavos de Final', home: 'Ganador M86', away: 'Ganador M88', date: '2026-07-07T18:00:00Z' },
-  { id: 'm96', phase: 'Octavos de Final', home: 'Ganador M85', away: 'Ganador M87', date: '2026-07-07T22:00:00Z' },
 
   // ══════════════════════════════════════════════════════════════════════════
   // CUARTOS DE FINAL  (Jul 9 – Jul 11)
@@ -102,3 +96,4 @@ export const knockoutFixture = [
 
   { id: 'm104', phase: 'Final', home: 'Ganador M101', away: 'Ganador M102', date: '2026-07-19T19:00:00Z' },
 ];
+// comentario: Los partidos de la fase eliminatoria se juegan a partido único. En caso de empate, se jugarán 30 minutos de tiempo extra y, si persiste el empate, se definirá por penales.
