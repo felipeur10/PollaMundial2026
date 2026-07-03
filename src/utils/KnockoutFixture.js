@@ -42,9 +42,9 @@ export const knockoutFixture = [
   { id: 'm85', phase: 'Ronda de 32', home: '1° Grupo B',  away: 'Mejor 3° (E/F/G/I/J)', date: '2026-07-03T03:00:00Z' },
 
   // Viernes 3 de Julio
-  { id: 'm86', phase: 'Ronda de 32', home: '1° Grupo J',  away: '2° Grupo H',            date: '2026-07-03T22:00:00Z' },
-  { id: 'm87', phase: 'Ronda de 32', home: '1° Grupo K', away: 'Mejor 3° (D/E/I/J/L)', date: '2026-07-03T18:00:00Z' },
-  { id: 'm88', phase: 'Ronda de 32', home: '2° Grupo D', away: '2° Grupo G',            date: '2026-07-04T01:30:00Z' },
+  { id: 'm86', phase: 'Ronda de 32', home: '1° Grupo J', away: '2° Grupo H',            date: '2026-07-03T22:00:00Z' },
+  { id: 'm87', phase: 'Ronda de 32', home: '1° Grupo K', away: 'Mejor 3° (D/E/I/J/L)', date: '2026-07-04T01:30:00Z' },
+  { id: 'm88', phase: 'Ronda de 32', home: '2° Grupo D', away: '2° Grupo G',            date: '2026-07-03T18:00:00Z' },
 
   // ══════════════════════════════════════════════════════════════════════════
   // OCTAVOS DE FINAL  (Jul 4 – Jul 7)
