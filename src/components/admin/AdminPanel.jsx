@@ -70,7 +70,6 @@ const AdminPanel = () => {
 
     const isDrawn = Number(hScore) === Number(aScore);
 
-    // ✅ En knockout con empate, exigir que se indique quien avanzó
     if (isKnockout && isDrawn) {
       const advances = results[matchId]?.advances;
       if (!advances) return alert("Es un empate en eliminatorias — indica quién avanzó antes de publicar.");
@@ -84,7 +83,6 @@ const AdminPanel = () => {
         publishedAt: new Date().toISOString()
       };
 
-      // ✅ Guardar advances solo si es knockout con empate
       if (isKnockout && isDrawn) {
         dataToSave.advances = results[matchId].advances;
       }
@@ -127,14 +125,12 @@ const AdminPanel = () => {
 
   const isPublished = (matchId) => results[matchId]?.status === 'finished';
 
-  // ✅ Helper: detectar si es empate en el input actual
   const isCurrentDraw = (matchId) => {
     const h = getHomeValue(matchId);
     const a = getAwayValue(matchId);
     return h !== '' && a !== '' && Number(h) === Number(a);
   };
 
-  // ✅ Nombres reales del partido (desde official_fixture o placeholder del knockoutFixture)
   const getMatchName = (match) => {
     const home = teams[match.id]?.home || match.home;
     const away = teams[match.id]?.away || match.away;
@@ -162,9 +158,19 @@ const AdminPanel = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {knockoutFixture.map(match => (
               <div key={match.id} className="bg-white p-5 rounded-3xl shadow-sm border border-gray-200">
-                <span className="text-[9px] font-black bg-blue-50 text-blue-600 px-3 py-1 rounded-full uppercase mb-4 inline-block">
-                  {match.phase}
-                </span>
+                {/* ✅ ID del partido visible */}
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[9px] font-black bg-blue-50 text-blue-600 px-3 py-1 rounded-full uppercase">
+                    {match.phase}
+                  </span>
+                  <span className="text-[9px] font-black bg-gray-100 text-gray-500 px-3 py-1 rounded-full uppercase tracking-widest">
+                    {match.id.toUpperCase()}
+                  </span>
+                </div>
+                {/* ✅ Placeholder con los cruces originales del fixture */}
+                <p className="text-[9px] text-gray-400 font-bold uppercase tracking-wide mb-2">
+                  {match.home} vs {match.away}
+                </p>
                 <div className="flex items-center gap-3 mt-2">
                   <input
                     placeholder={teams[match.id]?.home || "Local"}
@@ -224,7 +230,13 @@ const AdminPanel = () => {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
-                      <p className="text-[9px] font-black text-blue-500 uppercase">{match.group || match.phase}</p>
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <p className="text-[9px] font-black text-blue-500 uppercase">{match.group || match.phase}</p>
+                        {/* ✅ ID visible en bloque de resultados */}
+                        <span className="text-[9px] font-black bg-gray-100 text-gray-400 px-2 py-0.5 rounded-full uppercase">
+                          {match.id.toUpperCase()}
+                        </span>
+                      </div>
                       <p className="font-black text-sm text-gray-800 uppercase italic tracking-tighter">
                         {home} vs {away}
                       </p>
@@ -274,7 +286,7 @@ const AdminPanel = () => {
                     </div>
                   </div>
 
-                  {/* ✅ Selector de quien avanzó — solo aparece en knockout con empate */}
+                  {/* ✅ Selector de quien avanzó — solo en knockout con empate */}
                   {showAdvances && (
                     <div className="mt-4 p-4 bg-blue-50 rounded-2xl border border-blue-100">
                       <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-3">
