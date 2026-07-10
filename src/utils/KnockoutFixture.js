@@ -68,12 +68,13 @@ export const knockoutFixture = [
   { id: 'm97',  phase: 'Cuartos de Final', home: 'Ganador M89', away: 'Ganador M90', date: '2026-07-09T20:00:00Z' },
 
   // Viernes 10 de Julio
-  { id: 'm98',  phase: 'Cuartos de Final', home: 'Ganador M93', away: 'Ganador M94', date: '2026-07-10T17:00:00Z' },
-  { id: 'm99',  phase: 'Cuartos de Final', home: 'Ganador M91', away: 'Ganador M92', date: '2026-07-10T21:00:00Z' },
-
+  { id: 'm98',  phase: 'Cuartos de Final', home: 'Ganador M93', away: 'Ganador M94', date: '2026-07-10T19:00:00Z' },
+  
   // Sábado 11 de Julio
-  { id: 'm100', phase: 'Cuartos de Final', home: 'Ganador M95', away: 'Ganador M96', date: '2026-07-11T20:00:00Z' },
-
+  { id: 'm99',  phase: 'Cuartos de Final', home: 'Ganador M91', away: 'Ganador M92', date: '2026-07-11T21:00:00Z' },
+  
+  { id: 'm100', phase: 'Cuartos de Final', home: 'Ganador M95', away: 'Ganador M96', date: '2026-07-12T01:00:00Z' },
+ 
   // ══════════════════════════════════════════════════════════════════════════
   // SEMIFINALES  (Jul 14 – Jul 15)
   // ══════════════════════════════════════════════════════════════════════════
