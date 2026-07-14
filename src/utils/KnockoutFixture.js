@@ -80,10 +80,10 @@ export const knockoutFixture = [
   // ══════════════════════════════════════════════════════════════════════════
 
   // Martes 14 de Julio
-  { id: 'm101', phase: 'Semifinal', home: 'Ganador M97',  away: 'Ganador M98',  date: '2026-07-14T20:00:00Z' },
+  { id: 'm101', phase: 'Semifinal', home: 'Ganador M97',  away: 'Ganador M98',  date: '2026-07-14T19:00:00Z' },
 
   // Miércoles 15 de Julio
-  { id: 'm102', phase: 'Semifinal', home: 'Ganador M99',  away: 'Ganador M100', date: '2026-07-15T20:00:00Z' },
+  { id: 'm102', phase: 'Semifinal', home: 'Ganador M99',  away: 'Ganador M100', date: '2026-07-15T19:00:00Z' },
 
   // ══════════════════════════════════════════════════════════════════════════
   // TERCER LUGAR  (Jul 18)
